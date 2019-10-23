@@ -15,6 +15,8 @@ plot(x, y, type='l')
 
 ### Given some samples generate a CI
 
+Remember qt gives left hand side by default, while pt gives right hand side.
+
 ```R
 samples <- c(25, 31, 30)
 
@@ -71,3 +73,25 @@ Where pch is the type of point and col is color
 ```R
 plot(x,y, ylab="Endangered species recognized by COSEWIC", xlab="Population of Canada", pch=20, col="red")
 ```
+
+## Sampling
+
+Rememeber to keep everything in the same units.
+
+### Calculating mean and variation of mark recapture sampling protocol
+
+```R
+mean <- (m1 + 1) * (n2 + 1) / (m2 + 1)
+var <- (mr_xbar^2) * (n2 - m2 + 1) / ((n2 + 1) * (m2 + 2))
+stdev <- sqrt(mr_var)
+df <- n2 - 1
+```
+
+## General R tips
+
+### Apply functions
+
+Useful link: http://www.datasciencemadesimple.com/apply-function-r/
+
+tapply is by index of one column apply function in another
+sapply applies an anonymous function against a vector returning a vector of the same length
