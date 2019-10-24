@@ -113,6 +113,35 @@ plot(data, log="y")
 lines(x=data$Year, y=badger_model.geo)
 ```
 
+### Logistic model
+
+Based on building a linear model on growth rates and density
+
+```R
+nt <- data$pop.density[1:length(data$pop.density)-1]
+nt1 <- data$pop.density[-1]
+
+growth_rates <- nt1 / nt
+
+growth <- data.frame(nt, growth_rates)
+model <- lm("growth_rates ~ nt", growth)
+
+yintercept <- model$coefficients[1] # r value
+slope <- model$coefficients[2] # 
+xintercept <- -yintercept / slope # K-value
+
+dlogistic<-function(K, lambda, N0=2, t=15){ 
+  N<-c(N0, numeric(t))
+  for (i in 1:t) {
+    N[i+1]<- N[i] +  lambda * (1 - (N[i] / K)) * N[i]
+  } 
+  return(N) 
+}
+
+t <- 20
+Nts <- dlogistic(K=xintercept, lambda=yintercept, t=t)
+```
+
 ## Plotting
 
 ### Bar Plots With Segments
@@ -166,3 +195,15 @@ Useful link: http://www.datasciencemadesimple.com/apply-function-r/
 tapply is by index of one column apply function in another
 
 sapply applies an anonymous function against a vector returning a vector of the same length
+
+### Create a dataframe from vectors
+
+```R
+growth <- data.frame(nt, growth_rates)
+```
+
+### Importing functions
+
+```R
+source("dlogistic.R")
+```
