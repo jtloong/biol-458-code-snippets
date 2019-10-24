@@ -57,6 +57,62 @@ t.test(sample, mu=mu0, alternative="greater")
 var.test(sample, other.samples)
 ```
 
+## Regression
+
+### Linear models
+
+```R
+model <- lm(log(lp) ~ X, data = dataframe)
+summary(model)
+slope <- lm.r$coefficients["X"]
+```
+
+### Assess linear model
+
+This shows four diagnostic plots. Look to lab4 at the end for guidance on what they mean. Further consult Dyer page 115 (or 97 in the doc).
+
+```R
+layout(matrix(1:4, 2, 2))
+plot(model)
+```
+
+## Growth Models
+
+### Discrete growth rates between generations
+
+```R
+Nt1 <-data$Population[-1]
+Nt<-data$Population[1:length(data$Population)-1]
+pgrow<-Nt1/Nt
+```
+
+### Arithmetic mean model
+
+```R
+arith_mean <- mean(pgrow)
+
+time <- 1:length(data$Population)
+N0 <- data$Population[1]
+badger_model.arith <-sapply(arith_mean, function(lb) N0*lb^time)
+
+plot(x=time, y=Nt.s, log="y")
+lines(x=data$Year, y=badger_model.arith)
+```
+
+### Geo mean model
+
+```R
+r <- mean(log(pgrow))
+
+geo_lambda <- exp(r)
+time <- 1:length(data$Population)
+N0 <- data$Population[1]
+badger_model.geo <-sapply(geo_lambda, function(lb) N0*lb^time)
+
+plot(data, log="y")
+lines(x=data$Year, y=badger_model.geo)
+```
+
 ## Plotting
 
 ### Bar Plots With Segments
@@ -72,6 +128,20 @@ segments(b, c(myu, thu), b, c(myl, thl), lwd=1.5)
 Where pch is the type of point and col is color
 ```R
 plot(x,y, ylab="Endangered species recognized by COSEWIC", xlab="Population of Canada", pch=20, col="red")
+```
+
+### Plotting regression
+
+```R
+abline(model)
+```
+
+### Plotting least squared lines
+
+This code snippet plots distances between your model and the observed values. It takes coordinates where the first two terms are the vectors of x1, y1 with y1 being the predicted point and the second two terms are x2, y2 where y2 is the osberved point. (Obviously they have the same x value).
+
+```R
+segments(popdata$X, fitted(model), popdata$X, log(popdata$y))
 ```
 
 ## Sampling
@@ -94,4 +164,5 @@ df <- n2 - 1
 Useful link: http://www.datasciencemadesimple.com/apply-function-r/
 
 tapply is by index of one column apply function in another
+
 sapply applies an anonymous function against a vector returning a vector of the same length
