@@ -158,9 +158,6 @@ K=-mxlreg$par[2]
 ml=mxlreg$value
 ```
 
-###
-
-
 ### Stochastic Growth Models
 
 ```R
@@ -202,6 +199,12 @@ ucl =((stoch.pop.dens.mean)+1.96*pop.sd/sqrt(nrow(stoch.pop)))
 
 ## Matrix Models
 
+### Pre- and Post-Birth Sampling
+
+Pre-birth, one less stage; Post-birth, one more stage.
+
+
+
 ### Projecting Population
 
 ```R
@@ -212,6 +215,24 @@ years = 6
 for(i in 1:years){ 
   N.proj[,i+1]<-L%*%N.proj[,i]
 }
+```
+
+### Stochastic Matrix Projections
+
+Have a series of matrices, select them randomly to project
+
+```
+matrices <- c(L1, L2, L3)
+
+N.proj<-matrix(0,nrow=nrow(L), ncol=years+1)
+N.proj[,1] <- N0
+years = 6
+
+for(i in 1:years){
+  selection <- sample(1:length(matrices), 1)
+  N.proj[,i+1]<-matrices[selection]%*%N.proj[,i]
+}
+
 ```
 
 ### Dominant Eigenvalue and Left Eigenvector
@@ -352,4 +373,10 @@ When doing matrix selection it's [row, column]:
 
 ```R
 L%*%N0
+```
+
+### Import Dataframe via File Picker
+
+```R
+popdat<-read.csv(file.choose(), header=FALSE)
 ```
