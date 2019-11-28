@@ -103,6 +103,7 @@ lines(x=data$Year, y=badger_model.arith)
 
 ```R
 r <- mean(log(pgrow))
+stdev <- sd(log(pgrow))
 
 geo_lambda <- exp(r)
 time <- 1:length(data$Population)
@@ -141,6 +142,25 @@ dlogistic<-function(K, lambda, N0=2, t=15){
 t <- 20
 Nts <- dlogistic(K=xintercept, lambda=yintercept, t=t)
 ```
+### Maximmum Likelihood Estimation of Logistic Growth
+```R
+normlog = function(par) { y.pred = par[1]*(1 - dens/par[2])
+-sum(dnorm(lgr,mean=y.pred,sd=sqrt(par[3]),log=T)) }
+
+#use the optim function to find parameter values of maxlike
+# remember that par argument is the starting search values for par[1:3]
+mxlreg=optim(par=c(.5,100,1),normlog) 
+mxlreg
+
+#calculate r and K
+r=mxlreg$par[1]
+K=-mxlreg$par[2]
+ml=mxlreg$value
+```
+
+###
+
+
 ### Stochastic Growth Models
 
 ```R
