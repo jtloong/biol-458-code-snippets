@@ -271,3 +271,10 @@ growth <- data.frame(nt, growth_rates)
 ```R
 source("dlogistic.R")
 ```
+
+### Matrix Notation
+
+When doing matrix selection it's [row, column]:
+* x[1, 2] selects the element in the first row at the second column
+* x[1, ] selects all the data in the first row
+* x[, 1] selects all the data in the first column
