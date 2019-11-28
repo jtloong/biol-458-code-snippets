@@ -180,6 +180,55 @@ stoch.pop.mean=apply(stoch.pop, 1, function(x) mean(x, na.rm=TRUE))
 ucl =((stoch.pop.dens.mean)+1.96*pop.sd/sqrt(nrow(stoch.pop)))
 ```
 
+## Matrix Models
+
+### Projecting Population
+
+```R
+N.proj<-matrix(0,nrow=nrow(L), ncol=years+1)
+N.proj[,1] <- N0
+years = 6
+
+for(i in 1:years){ 
+  N.proj[,i+1]<-L%*%N.proj[,i]
+}
+```
+
+### Dominant Eigenvalue and Left Eigenvector
+This vector represents the stage proportions at the stable age distribution
+
+```R
+eigen.vals <- eigen(L)
+q <- which.max((eigen.vals$values))
+dom.eig=eigen.vals$values[q]
+
+sad1<-(eigen.vals$vectors[,q])
+sad2<-sad1/sum(sad1)
+```
+
+### Right Eigenvector
+This vector represents the reproductive value of each stage.
+```R
+tel<-eigen(t(L))
+repv<-Re(tel$vectors[,which.max(tel$values)])
+repv<-repv/repv[1]
+```
+
+### Calculating Sensitivities and Elasticities
+
+```R
+S.dem<-sum(repv*sad2)
+s=L
+n=dim(L)[1]
+for(i in 1:n) {
+  for(j in 1:n) {
+    s[i,j]=repv[i]*sad2[j]/S.dem;
+  }
+}
+
+elas<-Re(L/dom.eig*s)
+```
+
 ## Plotting
 
 ### Bar Plots With Segments
@@ -278,3 +327,9 @@ When doing matrix selection it's [row, column]:
 * x[1, 2] selects the element in the first row at the second column
 * x[1, ] selects all the data in the first row
 * x[, 1] selects all the data in the first column
+
+### Matrix Multiplication
+
+```R
+L%*%N0
+```
