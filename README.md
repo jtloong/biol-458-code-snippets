@@ -141,6 +141,44 @@ dlogistic<-function(K, lambda, N0=2, t=15){
 t <- 20
 Nts <- dlogistic(K=xintercept, lambda=yintercept, t=t)
 ```
+### Stochastic Growth Models
+
+```R
+threshold=24         
+project=30
+runs=1000  
+
+stoch.pop=matrix(NA,project,runs)
+stoch.pop.dens=matrix(NA,project,runs)
+stoch.pop[1,]=N0
+
+# two nested loops to create stochastic population sizes
+
+for (i in 1:runs){			
+	# looping over 1000 runs of the stochastic model
+  for (t in 2:project){		
+  	# and looping over 30 years of projection within each of 1000 runs
+    lambda=exp(rnorm(1,geomean,sqrt(var.r)))
+    # draw a value of lambda from a lognormal distribution
+    
+    #lambda=exp(sample(x=r,size=1,replace=T)) 
+    # or sample from within the existing observed growth rates
+    
+    stoch.pop[t,i]=stoch.pop[(t-1),i]*lambda
+         
+    if(stoch.pop[t,i]<=threshold) break  
+    # leave the loop if pop <= threshold
+  }
+}
+```
+
+### Stochastic Mean & CI
+
+```R
+pop.sd=apply(stoch.pop, 1, function(x) sd(x, na.rm=TRUE))
+stoch.pop.mean=apply(stoch.pop, 1, function(x) mean(x, na.rm=TRUE))
+ucl =((stoch.pop.dens.mean)+1.96*pop.sd/sqrt(nrow(stoch.pop)))
+```
 
 ## Plotting
 
@@ -172,6 +210,32 @@ This code snippet plots distances between your model and the observed values. It
 ```R
 segments(popdata$X, fitted(model), popdata$X, log(popdata$y))
 ```
+### Matrices
+
+```R
+matplot(x=(year1+1):(year1+project), y=stoch.pop, log="y", type="l", ylab='Ln Population Size', xlab=paste('Years'), col=cm.colors(ncol(stoch.pop)))
+x=(year1):(year1+project)
+lines(x,y=N[20]*exp(geomean)^(1:length(x)), col='blue',type="l")
+
+lines(x[-1],ucl,'l', col  = 'red', lwd=2, lty=2)
+abline(h=threshold, col='red', lwd=2, lty=2)
+
+```
+### Extinction Probabilities
+```R
+time=apply(stoch.pop,2, function(x) max(which(x>0)))
+#plot histogram of extinction times
+nbin<-hist(time,breaks=seq(0,project,by=1), main="distribution of extinction times")
+
+#plot cumulative probabiliy of extinction
+td<-cumsum(nbin$counts/runs)
+plot(1:project-1,td, xlab="years", ylab="cumulative probability of extinction", "l")
+mdext<-median(time)
+abline(v=mdext,lwd=2, col="red")
+mlabel<-paste("median time to quasi-extinction = ", mdext, sep=" ")
+text(x=14, y=.2,mlabel)
+```
+
 
 ## Sampling
 
